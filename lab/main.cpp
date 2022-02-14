@@ -1,23 +1,19 @@
 #include <bits/stdc++.h>
 
+using namespace std;
 using ll = long long;
 using ld = long double;
 
-void solve(std::istream& input, std::ostream& output)
+void solve()
 {
+	// Make the call
 }
 
 int main()
 {
-  std::ios_base::sync_with_stdio(false);
-  std::ifstream input("input.txt");
-  std::ofstream output("output.txt");
-  input.tie(nullptr);
-  output.tie(nullptr);
-  
-  solve(input, output);
-
-  output.flush();
-  input.close();
-  output.close();
+  freopen("input.txt", "r", stdin);
+  freopen("output.txt", "w", stdout);
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  solve();
 }
