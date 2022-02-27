@@ -44,16 +44,114 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
-const std::string CLOCKWISE = "clockwise";
-const std::string UNCLOCKWISE = "unclockwise";
-const std::string IMMOVABLE = "immovable";
-const std::string BLOCK = "block";
+enum class Rotation
+{
+	CLOCKWISE,
+	COUNTER_CLOCKWISE,
+	IMMOVABLE,
+};
+
+using GearColumn = std::vector<bool>;
+using GearSystem = std::vector<GearColumn>;
+
+GearSystem ReadGearSystem(std::istream& input, int N, int M)
+{
+	GearSystem system(N, GearColumn(N, false));
+	int firstGear, secondGear;
+	for (int i = 0; i < M; ++i)
+	{
+		input >> firstGear >> secondGear;
+		system[firstGear - 1][secondGear - 1] = true;
+		system[secondGear - 1][firstGear - 1] = true;
+	}
+
+	return system;
+}
+
+bool MarkRotations(const GearSystem& system, std::vector<Rotation>& rotations, int currentGear)
+{
+	for (int i = 0; i < system.size(); ++i)
+	{
+		if (system[currentGear][i])
+		{
+			if (rotations[currentGear] == Rotation::CLOCKWISE)
+			{
+				if (rotations[i] == Rotation::CLOCKWISE)
+				{
+					return false;
+				}
+
+				rotations[i] = Rotation::COUNTER_CLOCKWISE;
+			}
+			else if (rotations[currentGear] == Rotation::COUNTER_CLOCKWISE)
+			{
+				if (rotations[i] == Rotation::COUNTER_CLOCKWISE)
+				{
+					return false;
+				}
+
+				rotations[i] = Rotation::CLOCKWISE;
+			}
+		}
+	}
+
+	return true;
+}
+
+std::vector<Rotation> GetGearRotations(const GearSystem& system)
+{
+	std::vector<Rotation> result(system.size(), Rotation::IMMOVABLE);
+	result[0] = Rotation::CLOCKWISE;
+	for (int i = 0; i < system.size(); ++i)
+	{
+		if (!MarkRotations(system, result, i))
+		{
+			return {};
+		}
+	}
+
+	return result;
+}
+
+void PrintGearRotations(std::ostream& output, const std::vector<Rotation>& rotations)
+{
+	for (auto const& rotation : rotations)
+	{
+		switch (rotation)
+		{
+		case Rotation::CLOCKWISE:
+			output << "clockwise\n";
+			break;
+		case Rotation::COUNTER_CLOCKWISE:
+			output << "unclockwise\n";
+			break;
+		case Rotation::IMMOVABLE:
+			output << "immovable\n";
+			break;
+		default:
+			break;
+		}
+	}
+}
 
 void Solve(std::istream& input, std::ostream& output)
 {
 	int N, M;
 	input >> N >> M;
+
+	auto const system = ReadGearSystem(input, N, M);
+
+	auto const rotations = GetGearRotations(system);
+	if (!rotations.empty())
+	{
+		PrintGearRotations(output, rotations);
+	}
+	else
+	{
+		output << "block\n";
+	}
 }
 
 int main()
