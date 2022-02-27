@@ -36,12 +36,12 @@
  *
  * Среда выполнения:
  * Visual Studio 2022
-*/
+ */
 
 #define _CRT_SECURE_NO_WARNINGS
+#include <fstream>
 #include <iostream>
 #include <vector>
-#include <fstream>
 
 using Column = std::vector<char>;
 using Field = std::vector<Column>;
@@ -61,17 +61,17 @@ void FillExternal(Field& field, int const& N, int const& K, int row, int column)
 		{
 			FillExternal(field, N, K, row + 1, column);
 		}
-		
+
 		if (row - 1 >= 0)
 		{
 			FillExternal(field, N, K, row - 1, column);
 		}
-		
+
 		if (column + 1 < K)
 		{
 			FillExternal(field, N, K, row, column + 1);
 		}
-		
+
 		if (column - 1 >= 0)
 		{
 			FillExternal(field, N, K, row, column - 1);
