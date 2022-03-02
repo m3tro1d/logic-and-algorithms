@@ -4,7 +4,7 @@ using namespace std;
 using ll = long long;
 using ld = long double;
 
-void solve()
+void Solve()
 {
 	// Make the call
 }
@@ -15,5 +15,5 @@ int main()
 	freopen("output.txt", "w", stdout);
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr);
-	solve();
+	Solve();
 }
