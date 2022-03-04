@@ -86,33 +86,43 @@ void FillExternal(Field& field, int const& N, int const& K, const Cell& cell)
 	}
 }
 
-void PutFences(Field& field, int& result, const Cell& cell)
+void PutFences(Field& field, int& result, std::queue<Cell>& processQueue)
 {
-	if (field[cell.row][cell.column] == TREE)
+	if (!processQueue.empty())
 	{
-		field[cell.row][cell.column] = FENCED;
+		auto const cell = processQueue.front();
+		processQueue.pop();
 
-		if (field[cell.row + 1][cell.column] == EMPTY_EXTERNAL)
+		// TODO: move this processing out of here, organize loop while(!processQueue.empty())
+		if (field[cell.row][cell.column] == TREE)
 		{
-			++result;
-		}
-		if (field[cell.row - 1][cell.column] == EMPTY_EXTERNAL)
-		{
-			++result;
-		}
-		if (field[cell.row][cell.column + 1] == EMPTY_EXTERNAL)
-		{
-			++result;
-		}
-		if (field[cell.row][cell.column - 1] == EMPTY_EXTERNAL)
-		{
-			++result;
+			field[cell.row][cell.column] = FENCED;
+
+			if (field[cell.row + 1][cell.column] == EMPTY_EXTERNAL)
+			{
+				++result;
+			}
+			if (field[cell.row - 1][cell.column] == EMPTY_EXTERNAL)
+			{
+				++result;
+			}
+			if (field[cell.row][cell.column + 1] == EMPTY_EXTERNAL)
+			{
+				++result;
+			}
+			if (field[cell.row][cell.column - 1] == EMPTY_EXTERNAL)
+			{
+				++result;
+			}
+
+			processQueue.emplace(Cell{ cell.row + 1, cell.column });
+			processQueue.emplace(Cell{ cell.row - 1, cell.column });
+			processQueue.emplace(Cell{ cell.row, cell.column + 1 });
+			processQueue.emplace(Cell{ cell.row, cell.column - 1 });
 		}
 
-		PutFences(field, result, { cell.row + 1, cell.column });
-		PutFences(field, result, { cell.row - 1, cell.column });
-		PutFences(field, result, { cell.row, cell.column + 1 });
-		PutFences(field, result, { cell.row, cell.column - 1 });
+		// TODO: replace recursive call by linear
+		PutFences(field, result, processQueue);
 	}
 }
 
@@ -122,16 +132,16 @@ void Solve(std::istream& input, std::ostream& output)
 	input >> N >> K;
 
 	Field field(N + 2, Column(K + 2, EMPTY));
-	Cell start;
+	std::queue<Cell> processQueue;
+
 	for (int i = 1; i <= N; ++i)
 	{
 		for (int j = 1; j <= K; ++j)
 		{
 			input >> field[i][j];
-			if (field[i][j] == TREE && start.row == 0 && start.column == 0)
+			if (field[i][j] == TREE && processQueue.empty())
 			{
-				start.row = i;
-				start.column = j;
+				processQueue.emplace(Cell{ i, j });
 			}
 		}
 	}
@@ -139,7 +149,7 @@ void Solve(std::istream& input, std::ostream& output)
 	FillExternal(field, N + 2, K + 2, { 0, 0 });
 
 	int result = 0;
-	PutFences(field, result, start);
+	PutFences(field, result, processQueue);
 
 	output << result << '\n';
 }
