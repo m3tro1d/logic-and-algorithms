@@ -41,71 +41,78 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <fstream>
 #include <iostream>
+#include <queue>
 #include <vector>
 
 using Column = std::vector<char>;
 using Field = std::vector<Column>;
+
+struct Cell
+{
+	int row = 0;
+	int column = 0;
+};
 
 constexpr char EMPTY = '0';
 constexpr char TREE = '1';
 constexpr char FENCED = '2';
 constexpr char EMPTY_EXTERNAL = '3';
 
-void FillExternal(Field& field, int const& N, int const& K, int row, int column)
+void FillExternal(Field& field, int const& N, int const& K, const Cell& cell)
 {
-	if (field[row][column] == EMPTY)
+	if (field[cell.row][cell.column] == EMPTY)
 	{
-		field[row][column] = EMPTY_EXTERNAL;
+		field[cell.row][cell.column] = EMPTY_EXTERNAL;
 
-		if (row + 1 < N)
+		if (cell.row + 1 < N)
 		{
-			FillExternal(field, N, K, row + 1, column);
+			FillExternal(field, N, K, { cell.row + 1, cell.column });
 		}
 
-		if (row - 1 >= 0)
+		if (cell.row - 1 >= 0)
 		{
-			FillExternal(field, N, K, row - 1, column);
+			FillExternal(field, N, K, { cell.row - 1, cell.column });
 		}
 
-		if (column + 1 < K)
+		if (cell.column + 1 < K)
 		{
-			FillExternal(field, N, K, row, column + 1);
+			FillExternal(field, N, K, { cell.row, cell.column + 1 });
 		}
 
-		if (column - 1 >= 0)
+		if (cell.column - 1 >= 0)
 		{
-			FillExternal(field, N, K, row, column - 1);
+			FillExternal(field, N, K, { cell.row, cell.column - 1 });
 		}
 	}
 }
 
-void PutFences(Field& field, int& result, int row, int column)
+void PutFences(Field& field, int& result, const Cell& cell)
 {
-	if (field[row][column] == TREE)
+	if (field[cell.row][cell.column] == TREE)
 	{
-		field[row][column] = FENCED;
+		field[cell.row][cell.column] = FENCED;
 
-		if (field[row + 1][column] == EMPTY_EXTERNAL)
+		if (field[cell.row + 1][cell.column] == EMPTY_EXTERNAL)
 		{
 			++result;
 		}
-		if (field[row - 1][column] == EMPTY_EXTERNAL)
+		if (field[cell.row - 1][cell.column] == EMPTY_EXTERNAL)
 		{
 			++result;
 		}
-		if (field[row][column + 1] == EMPTY_EXTERNAL)
+		if (field[cell.row][cell.column + 1] == EMPTY_EXTERNAL)
 		{
 			++result;
 		}
-		if (field[row][column - 1] == EMPTY_EXTERNAL)
+		if (field[cell.row][cell.column - 1] == EMPTY_EXTERNAL)
 		{
 			++result;
 		}
 
-		PutFences(field, result, row + 1, column);
-		PutFences(field, result, row - 1, column);
-		PutFences(field, result, row, column + 1);
-		PutFences(field, result, row, column - 1);
+		PutFences(field, result, { cell.row + 1, cell.column });
+		PutFences(field, result, { cell.row - 1, cell.column });
+		PutFences(field, result, { cell.row, cell.column + 1 });
+		PutFences(field, result, { cell.row, cell.column - 1 });
 	}
 }
 
@@ -115,25 +122,24 @@ void Solve(std::istream& input, std::ostream& output)
 	input >> N >> K;
 
 	Field field(N + 2, Column(K + 2, EMPTY));
-	int startRow = 0;
-	int startColumn = 0;
+	Cell start;
 	for (int i = 1; i <= N; ++i)
 	{
 		for (int j = 1; j <= K; ++j)
 		{
 			input >> field[i][j];
-			if (field[i][j] == TREE && startRow == 0 && startColumn == 0)
+			if (field[i][j] == TREE && start.row == 0 && start.column == 0)
 			{
-				startRow = i;
-				startColumn = j;
+				start.row = i;
+				start.column = j;
 			}
 		}
 	}
 
-	FillExternal(field, N + 2, K + 2, 0, 0);
+	FillExternal(field, N + 2, K + 2, { 0, 0 });
 
 	int result = 0;
-	PutFences(field, result, startRow, startColumn);
+	PutFences(field, result, start);
 
 	output << result << '\n';
 }
