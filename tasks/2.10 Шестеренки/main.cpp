@@ -72,6 +72,9 @@ GearSystem ReadGearSystem(std::istream& input, int N, int M)
 
 bool MarkRotations(const GearSystem& system, std::vector<Rotation>& rotations, int currentGear)
 {
+	// TODO: current gear may be immovable by now
+	//  we can't imply that current gear has been processed by now
+	//  rotations can be marked recursively or with a queue, but not linear
 	for (int i = 0; i < system.size(); ++i)
 	{
 		if (system[currentGear][i])
