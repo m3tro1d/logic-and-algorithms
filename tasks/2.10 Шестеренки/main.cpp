@@ -43,7 +43,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <fstream>
 #include <iostream>
-#include <string>
+#include <queue>
 #include <vector>
 
 enum class Rotation
@@ -70,32 +70,38 @@ GearSystem ReadGearSystem(std::istream& input, int N, int M)
 	return system;
 }
 
-bool MarkRotations(const GearSystem& system, std::vector<Rotation>& rotations, int currentGear)
+bool MarkRotations(const GearSystem& system, std::vector<Rotation>& rotations, std::queue<int>& processQueue)
 {
-	// TODO: current gear may be immovable by now
-	//  we can't imply that current gear has been processed by now
-	//  rotations can be marked recursively or with a queue, but not linear
+	auto const gear = processQueue.front();
+	processQueue.pop();
+
 	for (int i = 0; i < system.size(); ++i)
 	{
-		if (system[currentGear][i])
+		if (system[gear][i])
 		{
-			if (rotations[currentGear] == Rotation::CLOCKWISE)
+			if (rotations[gear] == Rotation::CLOCKWISE)
 			{
 				if (rotations[i] == Rotation::CLOCKWISE)
 				{
 					return false;
 				}
-
-				rotations[i] = Rotation::COUNTER_CLOCKWISE;
+				else if (rotations[i] == Rotation::IMMOVABLE)
+				{
+					rotations[i] = Rotation::COUNTER_CLOCKWISE;
+					processQueue.emplace(i);
+				}
 			}
-			else if (rotations[currentGear] == Rotation::COUNTER_CLOCKWISE)
+			else if (rotations[gear] == Rotation::COUNTER_CLOCKWISE)
 			{
 				if (rotations[i] == Rotation::COUNTER_CLOCKWISE)
 				{
 					return false;
 				}
-
-				rotations[i] = Rotation::CLOCKWISE;
+				else if (rotations[i] == Rotation::IMMOVABLE)
+				{
+					rotations[i] = Rotation::CLOCKWISE;
+					processQueue.emplace(i);
+				}
 			}
 		}
 	}
@@ -107,9 +113,12 @@ std::vector<Rotation> GetGearRotations(const GearSystem& system)
 {
 	std::vector<Rotation> result(system.size(), Rotation::IMMOVABLE);
 	result[0] = Rotation::CLOCKWISE;
-	for (int i = 0; i < system.size(); ++i)
+
+	std::queue<int> processQueue;
+	processQueue.emplace(0);
+	while (!processQueue.empty())
 	{
-		if (!MarkRotations(system, result, i))
+		if (!MarkRotations(system, result, processQueue))
 		{
 			return {};
 		}
