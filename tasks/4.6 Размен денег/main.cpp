@@ -36,6 +36,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <vector>
 
 int CalculateMinChange(int sum, const std::vector<int>& coins, std::vector<int>& cache, std::vector<int>& last)
@@ -76,11 +77,36 @@ int CalculateMinChange(int sum, const std::vector<int>& coins, std::vector<int>&
 
 void PrintResult(std::ostream& output, int minChange, int sum, const std::vector<int>& last)
 {
-	output << minChange << '\n';
-	while (sum > 0)
+	if (minChange > 0)
 	{
-		output << last[sum] << ' ';
-		sum -= last[sum];
+		std::vector<int> coinAmounts(sum, 0);
+		while (sum > 0)
+		{
+			int coin = last[sum];
+			++coinAmounts[coin];
+			sum -= coin;
+		}
+
+		int coinTypesAmount = 0;
+		std::map<int, int> coinTypes;
+		for (int i = 0; i < coinAmounts.size(); ++i)
+		{
+			if (coinAmounts[i] > 0)
+			{
+				++coinTypesAmount;
+				coinTypes[i] = coinAmounts[i];
+			}
+		}
+
+		output << coinTypesAmount << ' ' << minChange << '\n';
+		for (auto it = coinTypes.rbegin(); it != coinTypes.rend(); ++it)
+		{
+			output << it->first << ' ' << it->second << '\n';
+		}
+	}
+	else
+	{
+		output << "No\n";
 	}
 }
 
@@ -99,16 +125,7 @@ void Solve(std::istream& input, std::ostream& output)
 	std::vector<int> last(L + 1, 0);
 
 	int minChange = CalculateMinChange(L, C, cache, last);
-	if (minChange > 0)
-	{
-		PrintResult(output, minChange, L, last);
-	}
-	else
-	{
-		output << "No";
-	}
-
-	output << '\n';
+	PrintResult(output, minChange, L, last);
 }
 
 int main()
