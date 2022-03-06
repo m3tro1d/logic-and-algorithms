@@ -57,6 +57,7 @@ int CalculateMinChange(int sum, const std::vector<int>& coins, std::vector<int>&
 		if (sum == coin)
 		{
 			last[sum] = coin;
+			cache[sum] = coin;
 			return 1;
 		}
 
