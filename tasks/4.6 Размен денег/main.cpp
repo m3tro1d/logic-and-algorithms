@@ -74,6 +74,16 @@ int CalculateMinChange(int sum, const std::vector<int>& coins, std::vector<int>&
 	return min;
 }
 
+void PrintResult(std::ostream& output, int minChange, int sum, const std::vector<int>& last)
+{
+	output << minChange << '\n';
+	while (sum > 0)
+	{
+		output << last[sum] << ' ';
+		sum -= last[sum];
+	}
+}
+
 void Solve(std::istream& input, std::ostream& output)
 {
 	int L, N;
@@ -91,12 +101,7 @@ void Solve(std::istream& input, std::ostream& output)
 	int minChange = CalculateMinChange(L, C, cache, last);
 	if (minChange > 0)
 	{
-		output << minChange << '\n';
-		while (L > 0)
-		{
-			output << last[L] << ' ';
-			L -= last[L];
-		}
+		PrintResult(output, minChange, L, last);
 	}
 	else
 	{
