@@ -37,7 +37,44 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <vector>
+
+int FindMinChange(int sum, const std::vector<int>& coins, std::vector<int>& last)
+{
+	std::vector<int> values(sum + 1, 0);
+	for (int i = 1; i <= sum; ++i)
+	{
+		values[i] = std::numeric_limits<int>::max();
+		for (auto const& coin : coins)
+		{
+			if (i - coin >= 0 && values[i - coin] + 1 < values[i])
+			{
+				values[i] = values[i - coin] + 1;
+				last[i] = coin;
+			}
+		}
+	}
+
+	return values[sum];
+}
+
+void PrintSolution(std::ostream& output, int sum, int minChange, const std::vector<int>& last)
+{
+	std::map<int, int> coinOccurrences;
+	while (sum > 0)
+	{
+		int coinValue = last[sum];
+		sum -= coinValue;
+		++coinOccurrences[coinValue];
+	}
+
+	output << coinOccurrences.size() << ' ' << minChange << '\n';
+	for (auto it = coinOccurrences.rbegin(); it != coinOccurrences.rend(); ++it)
+	{
+		output << it->first << ' ' << it->second << '\n';
+	}
+}
 
 void Solve(std::istream& input, std::ostream& output)
 {
@@ -50,26 +87,16 @@ void Solve(std::istream& input, std::ostream& output)
 		input >> C[i];
 	}
 
-	std::vector<int> values(L + 1, 0);
 	std::vector<int> last(L + 1, 0);
-	for (int i = 1; i <= L; ++i)
-	{
-		values[i] = std::numeric_limits<int>::max();
-		for (auto const& coin : C)
-		{
-			if (i - coin >= 0 && values[i - coin] + 1 < values[i])
-			{
-				values[i] = values[i - coin] + 1;
-				last[i] = coin;
-			}
-		}
-	}
+	int minChange = FindMinChange(L, C, last);
 
-	output << values[L] << '\n';
-	while (L > 0)
+	if (minChange != std::numeric_limits<int>::min() + 1)
 	{
-		output << last[L] << ' ';
-		L -= last[L];
+		PrintSolution(output, L, minChange, last);
+	}
+	else
+	{
+		output << "No\n";
 	}
 }
 
