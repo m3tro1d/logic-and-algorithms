@@ -36,80 +36,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <fstream>
 #include <iostream>
-#include <map>
+#include <limits>
 #include <vector>
-
-int CalculateMinChange(int sum, const std::vector<int>& coins, std::vector<int>& cache, std::vector<int>& last)
-{
-	if (sum <= 0)
-	{
-		return 0;
-	}
-
-	if (cache[sum] != 0)
-	{
-		return cache[sum];
-	}
-
-	int min = INT_MAX;
-	for (auto const& coin : coins)
-	{
-		if (sum == coin)
-		{
-			last[sum] = coin;
-			cache[sum] = coin;
-			return 1;
-		}
-
-		if (sum >= coin)
-		{
-			int value = CalculateMinChange(sum - coin, coins, cache, last) + 1;
-			if (value < min)
-			{
-				min = value;
-				last[sum] = coin;
-			}
-		}
-	}
-
-	cache[sum] = min;
-	return min;
-}
-
-void PrintResult(std::ostream& output, int minChange, int sum, const std::vector<int>& last)
-{
-	if (minChange > 0)
-	{
-		std::vector<int> coinAmounts(sum, 0);
-		while (sum > 0)
-		{
-			int coin = last[sum];
-			++coinAmounts[coin];
-			sum -= coin;
-		}
-
-		int coinTypesAmount = 0;
-		std::map<int, int> coinTypes;
-		for (int i = 0; i < coinAmounts.size(); ++i)
-		{
-			if (coinAmounts[i] > 0)
-			{
-				++coinTypesAmount;
-				coinTypes[i] = coinAmounts[i];
-			}
-		}
-
-		output << coinTypesAmount << ' ' << minChange << '\n';
-		for (auto it = coinTypes.rbegin(); it != coinTypes.rend(); ++it)
-		{
-			output << it->first << ' ' << it->second << '\n';
-		}
-	}
-	else
-	{
-		output << "No\n";
-	}
-}
 
 void Solve(std::istream& input, std::ostream& output)
 {
@@ -122,11 +50,27 @@ void Solve(std::istream& input, std::ostream& output)
 		input >> C[i];
 	}
 
-	std::vector<int> cache(L + 1, 0);
+	std::vector<int> values(L + 1, 0);
 	std::vector<int> last(L + 1, 0);
+	for (int i = 1; i <= L; ++i)
+	{
+		values[i] = std::numeric_limits<int>::max();
+		for (auto const& coin : C)
+		{
+			if (i - coin >= 0 && values[i - coin] + 1 < values[i])
+			{
+				values[i] = values[i - coin] + 1;
+				last[i] = coin;
+			}
+		}
+	}
 
-	int minChange = CalculateMinChange(L, C, cache, last);
-	PrintResult(output, minChange, L, last);
+	output << values[L] << '\n';
+	while (L > 0)
+	{
+		output << last[L] << ' ';
+		L -= last[L];
+	}
 }
 
 int main()
