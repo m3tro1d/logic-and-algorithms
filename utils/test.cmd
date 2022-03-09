@@ -7,20 +7,23 @@ if %subject% == "" (
 )
 
 FOR %%f in (tests\*.in) DO (
-  %subject% <"%%f" >"tests\%%~nf.txt" || goto failed
-  fc "tests\%%~nf.txt" "tests\%%~nf.out" > nul || goto failed
+  COPY %%f input.txt > nul
+  %subject% > nul || goto failed
+  fc output.txt "tests\%%~nf.out" > nul || goto failed
   echo Test %%f passed
 )
 
+echo.
 echo All tests passed
-del tests\*.txt
+del input.txt output.txt
 exit /B 0
 
 :failed
+echo.
 echo Test failed
-del tests\*.txt
+del input.txt output.txt
 exit /B 1
 
 :error
-del tests\*.txt
+del input.txt output.txt
 exit /B 1
