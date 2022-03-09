@@ -90,7 +90,7 @@ void Solve(std::istream& input, std::ostream& output)
 	std::vector<int> last(L + 1, 0);
 	int minChange = FindMinChange(L, C, last);
 
-	if (minChange != std::numeric_limits<int>::min() + 1)
+	if (minChange > 0)
 	{
 		PrintSolution(output, L, minChange, last);
 	}
