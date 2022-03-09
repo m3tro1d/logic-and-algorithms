@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 project(scratch)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(scratch main.cpp)
 add_custom_command(TARGET scratch
