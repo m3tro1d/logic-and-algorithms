@@ -40,23 +40,30 @@
 #include <map>
 #include <vector>
 
-int FindMinChange(int sum, const std::vector<int>& coins, std::vector<int>& last)
+int FindMinChange(int overallSum, const std::vector<int>& coins, std::vector<int>& last)
 {
-	std::vector<int> values(sum + 1, 0);
-	for (int i = 1; i <= sum; ++i)
+	std::vector<int> values(overallSum + 1, -1);
+	values[0] = 0;
+	for (int currentSum = 1; currentSum <= overallSum; ++currentSum)
 	{
-		values[i] = std::numeric_limits<int>::max();
+		auto min = std::numeric_limits<int>::max();
 		for (auto const& coin : coins)
 		{
-			if (i - coin >= 0 && values[i - coin] + 1 < values[i])
+			auto const& valueForCoin = values[currentSum - coin];
+			if (currentSum - coin >= 0 && valueForCoin != -1 && valueForCoin + 1 < min)
 			{
-				values[i] = values[i - coin] + 1;
-				last[i] = coin;
+				min = valueForCoin + 1;
+				last[currentSum] = coin;
 			}
+		}
+
+		if (min < std::numeric_limits<int>::max())
+		{
+			values[currentSum] = min;
 		}
 	}
 
-	return values[sum];
+	return values[overallSum];
 }
 
 void PrintSolution(std::ostream& output, int sum, int minChange, const std::vector<int>& last)
