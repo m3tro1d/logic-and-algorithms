@@ -32,13 +32,53 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <fstream>
 #include <iostream>
+#include <vector>
+
+using ll = long long;
+
+constexpr int MAX = 1000001;
+
+constexpr char BOY = 'b';
+constexpr char GIRL = 'a';
+
+ll FindVariants(std::istream& input, int N)
+{
+	ll result = 0;
+	std::vector<int> values(MAX * 2, 0);
+
+	char ch;
+	int depth = 0;
+	for (int i = 0; i < N; ++i)
+	{
+		input.get(ch);
+		if (ch == BOY)
+		{
+			++depth;
+		}
+		else if (ch == GIRL)
+		{
+			--depth;
+		}
+
+		if (depth == 0)
+		{
+			++result;
+		}
+
+		result += values[depth + MAX];
+		++values[depth + MAX];
+	}
+
+	return result;
+}
 
 void Solve(std::istream& input, std::ostream& output)
 {
 	int N;
-	std::cin >> N;
+	input >> N;
+	input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-	// TODO
+	output << FindVariants(input, N) << '\n';
 }
 
 int main()
