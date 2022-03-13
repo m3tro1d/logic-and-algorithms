@@ -49,11 +49,14 @@ int FindMinChange(int overallSum, const std::vector<int>& coins, std::vector<int
 		auto min = std::numeric_limits<int>::max();
 		for (auto const& coin : coins)
 		{
-			auto const& valueForCoin = values[currentSum - coin];
-			if (currentSum - coin >= 0 && valueForCoin != -1 && valueForCoin + 1 < min)
+			if (currentSum >= coin)
 			{
-				min = valueForCoin + 1;
-				last[currentSum] = coin;
+				auto const& valueForCoin = values[currentSum - coin];
+				if (valueForCoin != -1 && valueForCoin + 1 < min)
+				{
+					min = valueForCoin + 1;
+					last[currentSum] = coin;
+				}
 			}
 		}
 
