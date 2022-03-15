@@ -36,13 +36,25 @@
 
 using ll = long long;
 
-constexpr int MAX = 1000001;
+constexpr int MAX = 1000000;
 
 constexpr char BOY = 'b';
 constexpr char GIRL = 'a';
 
 ll FindVariants(std::istream& input, int N)
 {
+	/*
+	* Пояснение:
+	* 
+	* Рекурсивная формула на основании "глубины" символа N в строке.
+	* 'b' = +1 к глубине, 'a' = -1. В качестве центра используется фиксированный
+	* максимум N = 10^6 в представлении в std::vector.
+	* 
+	* Значение формулы для символа N:
+	* F(N) = F(N - 1) + depths[depth]
+	* Плюс прооверка на нулевую глубину (++result)
+	*/
+
 	ll result = 0;
 	std::vector<int> values(MAX * 2, 0);
 
