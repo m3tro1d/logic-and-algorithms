@@ -42,9 +42,48 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <vector>
+
+using ll = long long;
+
+ll FindSolutions(const std::string& str)
+{
+	ll result = (str.length() + 1) * (str.length() + 2) / 2; // Случай для вставки ()
+
+	int currentDepth = 0;
+	int positionsBetweenZeroDepths = 0;
+	for (auto const& ch : str)
+	{
+		if (ch == '(')
+		{
+			++currentDepth;
+		}
+		else if (ch == ')')
+		{
+			--currentDepth;
+		}
+
+		if (currentDepth == 0)
+		{
+			result += positionsBetweenZeroDepths * (positionsBetweenZeroDepths + 1) / 2; // Случай для вставки )(
+			positionsBetweenZeroDepths = 0;
+		}
+		else
+		{
+			++positionsBetweenZeroDepths;
+		}
+	}
+
+	return result;
+}
 
 void Solve(std::istream& input, std::ostream& output)
 {
+	std::string brackets;
+	std::getline(input, brackets);
+
+	output << FindSolutions(brackets) << '\n';
 }
 
 int main()
