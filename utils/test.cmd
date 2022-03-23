@@ -20,10 +20,8 @@ exit /B 0
 
 :failed
 echo.
-echo Test failed
-del input.txt output.txt
+echo Test failed. Check input.txt and output.txt
 exit /B 1
 
 :error
-del input.txt output.txt
 exit /B 1
