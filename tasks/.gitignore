@@ -400,5 +400,5 @@ FodyWeavers.xsd
 
 # Testing
 test.cmd
-input.txt
-output.txt
+input*.txt
+output*.txt
