@@ -43,7 +43,7 @@
 
 using Coefficients = std::vector<int>;
 
-constexpr double STEP = 0.00001;
+constexpr double STEP = 1e-5;
 constexpr int PRINT_PRECISION = 10;
 
 double FindMaxBrightnessForTime(double t, Coefficients const& A, Coefficients const& B)
