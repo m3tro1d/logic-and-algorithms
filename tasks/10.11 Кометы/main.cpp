@@ -48,7 +48,7 @@ constexpr int PRINT_PRECISION = 10;
 
 double FindMaxBrightnessForTime(double t, Coefficients const& A, Coefficients const& B)
 {
-	double maxBrightness = std::numeric_limits<double>::min();
+	double maxBrightness = std::numeric_limits<double>::lowest();
 	for (int i = 0; i < A.size(); ++i)
 	{
 		double const S = A[i] * t + B[i];
