@@ -51,10 +51,10 @@ double FindMaxBrightnessForTime(double t, Coefficients const& A, Coefficients co
 	double maxBrightness = std::numeric_limits<double>::lowest();
 	for (int i = 0; i < A.size(); ++i)
 	{
-		double const S = A[i] * t + B[i];
-		if (S > maxBrightness)
+		double const Y = A[i] * t + B[i];
+		if (Y > maxBrightness)
 		{
-			maxBrightness = S;
+			maxBrightness = Y;
 		}
 	}
 
