@@ -46,10 +46,10 @@ using Coefficients = std::vector<int>;
 constexpr double STEP = 0.00001;
 constexpr int PRINT_PRECISION = 10;
 
-double FindMaxBrightnessForTime(double t, int N, Coefficients const& A, Coefficients const& B)
+double FindMaxBrightnessForTime(double t, Coefficients const& A, Coefficients const& B)
 {
 	double maxBrightness = std::numeric_limits<double>::min();
-	for (int i = 0; i < N; ++i)
+	for (int i = 0; i < A.size(); ++i)
 	{
 		double const S = A[i] * t + B[i];
 		if (S > maxBrightness)
@@ -71,7 +71,7 @@ double FindMinBrightnessOverTime(double overallTime, Coefficients const& A, Coef
 
 	for (double currentTime = 0; currentTime <= overallTime; currentTime += STEP)
 	{
-		double const currentBrightness = FindMaxBrightnessForTime(currentTime, A.size(), A, B);
+		double const currentBrightness = FindMaxBrightnessForTime(currentTime, A, B);
 
 		if (currentBrightness < minBrightness)
 		{
