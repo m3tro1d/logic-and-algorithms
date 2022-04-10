@@ -41,17 +41,22 @@
 #include <iostream>
 #include <vector>
 
-using Coefficients = std::vector<int>;
+using Coefficients = std::vector<std::pair<int, int>>;
 
-constexpr double STEP = 1e-5;
+constexpr double PRECISION = 1e-12;
 constexpr int PRINT_PRECISION = 10;
 
-double FindMaxBrightnessForTime(double t, Coefficients const& A, Coefficients const& B)
+bool ApproximatelyEqual(double a, double b)
+{
+	return std::abs(a - b) < PRECISION;
+}
+
+double FindMaxBrightnessForTime(double t, Coefficients const& coefficients)
 {
 	double maxBrightness = std::numeric_limits<double>::lowest();
-	for (int i = 0; i < A.size(); ++i)
+	for (auto const& [A, B] : coefficients)
 	{
-		double const Y = A[i] * t + B[i];
+		double const Y = A * t + B;
 		if (Y > maxBrightness)
 		{
 			maxBrightness = Y;
@@ -61,25 +66,35 @@ double FindMaxBrightnessForTime(double t, Coefficients const& A, Coefficients co
 	return maxBrightness;
 }
 
-/*
- * Суть алгоритма: находим минимальную яркость из максимальных
- * по всем кометам и по всей оси t с заданным шагом.
- */
-double FindMinBrightnessOverTime(double overallTime, Coefficients const& A, Coefficients const& B)
+double FindMinBrightnessOverTime(double overallTime, Coefficients const& coefficients)
 {
-	double minBrightness = std::numeric_limits<double>::max();
+	double low = 0;
+	double high = overallTime;
 
-	for (double currentTime = 0; currentTime <= overallTime; currentTime += STEP)
+	double lowValue = FindMaxBrightnessForTime(low, coefficients);
+	double highValue = FindMaxBrightnessForTime(high, coefficients);
+
+	while (!ApproximatelyEqual(lowValue, highValue))
 	{
-		double const currentBrightness = FindMaxBrightnessForTime(currentTime, A, B);
+		double const low3 = (2 * low + high) / 3;
+		double const high3 = (low + 2 * high) / 3;
 
-		if (currentBrightness < minBrightness)
+		double const low3Value = FindMaxBrightnessForTime(low3, coefficients);
+		double const high3Value = FindMaxBrightnessForTime(high3, coefficients);
+
+		if (!ApproximatelyEqual(low3Value, high3Value) && low3Value > high3Value)
 		{
-			minBrightness = currentBrightness;
+			low = low3;
+			lowValue = low3Value;
+		}
+		else
+		{
+			high = high3;
+			highValue = high3Value;
 		}
 	}
 
-	return minBrightness;
+	return FindMaxBrightnessForTime((low + high) / 2, coefficients);
 }
 
 void Solve(std::istream& input, std::ostream& output)
@@ -88,14 +103,14 @@ void Solve(std::istream& input, std::ostream& output)
 	int T;
 	input >> N >> T;
 
-	Coefficients A(N);
-	Coefficients B(N);
+	Coefficients coefficients(N);
 	for (int i = 0; i < N; ++i)
 	{
-		input >> A[i] >> B[i];
+		auto& current = coefficients[i];
+		input >> current.first >> current.second;
 	}
 
-	auto const minBrightness = FindMinBrightnessOverTime(T, A, B);
+	auto const minBrightness = FindMinBrightnessOverTime(T, coefficients);
 
 	output << std::fixed << std::setprecision(PRINT_PRECISION)
 		   << minBrightness << '\n';
