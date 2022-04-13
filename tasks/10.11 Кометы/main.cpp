@@ -43,7 +43,7 @@
 
 using Coefficients = std::vector<std::pair<int, int>>;
 
-constexpr double PRECISION = 1e-12;
+constexpr double PRECISION = std::numeric_limits<double>::epsilon();
 constexpr int PRINT_PRECISION = 10;
 
 bool ApproximatelyEqual(double a, double b)
