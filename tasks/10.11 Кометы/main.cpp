@@ -51,6 +51,16 @@ bool ApproximatelyEqual(double a, double b)
 	return std::abs(a - b) < PRECISION;
 }
 
+bool GreaterWithinPrecision(double a, double b)
+{
+	if (ApproximatelyEqual(a, b))
+	{
+
+		return false;
+	}
+	return a > b;
+}
+
 double FindMaxBrightnessForTime(double t, Coefficients const& coefficients)
 {
 	double maxBrightness = std::numeric_limits<double>::lowest();
@@ -74,7 +84,7 @@ double FindMinBrightnessOverTime(double overallTime, Coefficients const& coeffic
 	double lowValue = FindMaxBrightnessForTime(low, coefficients);
 	double highValue = FindMaxBrightnessForTime(high, coefficients);
 
-	while (!ApproximatelyEqual(lowValue, highValue))
+	while (GreaterWithinPrecision(std::abs(highValue - lowValue), PRECISION))
 	{
 		double const low3 = (2 * low + high) / 3;
 		double const high3 = (low + 2 * high) / 3;
