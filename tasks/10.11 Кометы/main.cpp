@@ -92,7 +92,7 @@ double FindMinBrightnessOverTime(double overallTime, Coefficients const& coeffic
 		double const low3Value = FindMaxBrightnessForTime(low3, coefficients);
 		double const high3Value = FindMaxBrightnessForTime(high3, coefficients);
 
-		if (!ApproximatelyEqual(low3Value, high3Value) && low3Value > high3Value)
+		if (GreaterWithinPrecision(low3Value, high3Value))
 		{
 			low = low3;
 			lowValue = low3Value;
