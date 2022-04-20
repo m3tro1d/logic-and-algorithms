@@ -46,21 +46,6 @@ using Coefficients = std::vector<std::pair<int, int>>;
 constexpr double PRECISION = 1e-12;
 constexpr int PRINT_PRECISION = 10;
 
-bool ApproximatelyEqual(double a, double b)
-{
-	return std::abs(a - b) < PRECISION;
-}
-
-bool GreaterWithinPrecision(double a, double b)
-{
-	if (ApproximatelyEqual(a, b))
-	{
-
-		return false;
-	}
-	return a > b;
-}
-
 double FindMaxBrightnessForTime(double t, Coefficients const& coefficients)
 {
 	double maxBrightness = std::numeric_limits<double>::lowest();
@@ -81,10 +66,7 @@ double FindMinBrightnessOverTime(double overallTime, Coefficients const& coeffic
 	double low = 0;
 	double high = overallTime;
 
-	double lowValue = FindMaxBrightnessForTime(low, coefficients);
-	double highValue = FindMaxBrightnessForTime(high, coefficients);
-
-	while (GreaterWithinPrecision(std::abs(highValue - lowValue), PRECISION))
+	while (high - low > PRECISION)
 	{
 		double const low3 = (2 * low + high) / 3;
 		double const high3 = (low + 2 * high) / 3;
@@ -92,15 +74,13 @@ double FindMinBrightnessOverTime(double overallTime, Coefficients const& coeffic
 		double const low3Value = FindMaxBrightnessForTime(low3, coefficients);
 		double const high3Value = FindMaxBrightnessForTime(high3, coefficients);
 
-		if (!ApproximatelyEqual(low3Value, high3Value) && low3Value > high3Value)
+		if (low3Value > high3Value)
 		{
 			low = low3;
-			lowValue = low3Value;
 		}
 		else
 		{
 			high = high3;
-			highValue = high3Value;
 		}
 	}
 
