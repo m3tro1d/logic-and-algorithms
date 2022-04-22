@@ -50,6 +50,41 @@ bool DoesRectangleIntersect(Point const& leftTop, Point const& rightBottom, int 
 	return leftTop.x <= x && rightBottom.x > x;
 }
 
+void DoubleSort(std::vector<int> coordinates, std::vector<int>& indicators, int left, int right)
+{
+	int pivot = coordinates[(left + right) / 2];
+	int i = left;
+	int j = right;
+	do
+	{
+		while (pivot > coordinates[i])
+		{
+			++i;
+		}
+		while (pivot < coordinates[j])
+		{
+			--j;
+		}
+
+		if (i <= j)
+		{
+			std::swap(coordinates[i], coordinates[j]);
+			std::swap(indicators[i], indicators[j]);
+			++i;
+			--j;
+		}
+	} while (i <= j);
+
+	if (left < j)
+	{
+		DoubleSort(coordinates, indicators, left, j);
+	}
+	if (i < right)
+	{
+		DoubleSort(coordinates, indicators, i, right);
+	}
+}
+
 void Solve(std::istream& input, std::ostream& output)
 {
 	size_t N;
@@ -107,10 +142,24 @@ void Solve(std::istream& input, std::ostream& output)
 				}
 				else
 				{
-					// sort yCoordinates
-					// calculate height
+					DoubleSort(yCoordinates, sectionIndicators, 0, M - 1);
 
-					// TODO: decompose on functions
+					int sc = 0;
+					int bb = 0;
+					if (sectionIndicators[0] > 0)
+					{
+						++bb;
+					}
+					for (size_t k = 1; k < N; ++k)
+					{
+						if (bb > 0)
+						{
+							sc += yCoordinates[k] - yCoordinates[k - 1];
+							bb += sectionIndicators[k];
+						}
+					}
+
+					sectionHeight = std::abs(sc);
 				}
 			}
 		}
