@@ -102,8 +102,8 @@ void Solve(std::istream& input, std::ostream& output)
 		points[0].push_back(leftTopCorner);
 		points[1].push_back(rightBottomCorner);
 
-		xCoordinates[2 * i - 1] = leftTopCorner.x;
-		xCoordinates[2 * i] = rightBottomCorner.x;
+		xCoordinates[2 * i] = leftTopCorner.x;
+		xCoordinates[2 * i + 1] = rightBottomCorner.x;
 	}
 
 	std::sort(xCoordinates.begin(), xCoordinates.end());
@@ -117,7 +117,7 @@ void Solve(std::istream& input, std::ostream& output)
 			result += std::abs((xCoordinates[i] - xCoordinates[i - 1]) * sectionHeight);
 		}
 
-		if (i == 1 || xCoordinates[i] != xCoordinates[i - 1])
+		if (i == 1 || xCoordinates[i + 1] != xCoordinates[i])
 		{
 			size_t M = 0;
 			std::vector<int> yCoordinates(2 * N);
