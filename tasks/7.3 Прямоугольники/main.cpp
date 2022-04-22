@@ -112,12 +112,12 @@ void Solve(std::istream& input, std::ostream& output)
 	int result = 0;
 	for (size_t i = 0; i < 2 * N; ++i)
 	{
-		if (i > 0)
+		if (i != 0)
 		{
 			result += std::abs((xCoordinates[i] - xCoordinates[i - 1]) * sectionHeight);
 		}
 
-		if (i == 1 || xCoordinates[i + 1] != xCoordinates[i])
+		if (i == 0 || xCoordinates[i] != xCoordinates[i - 1])
 		{
 			size_t M = 0;
 			std::vector<int> yCoordinates(2 * N);
