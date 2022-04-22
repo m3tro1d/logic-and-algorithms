@@ -99,6 +99,15 @@ void Solve(std::istream& input, std::ostream& output)
 		Point rightBottomCorner;
 		input >> rightBottomCorner.x >> rightBottomCorner.y;
 
+		if (leftTopCorner.x > rightBottomCorner.x)
+		{
+			std::swap(leftTopCorner.x, rightBottomCorner.x);
+		}
+		if (leftTopCorner.y > rightBottomCorner.y)
+		{
+			std::swap(leftTopCorner.y, rightBottomCorner.y);
+		}
+
 		points[0].push_back(leftTopCorner);
 		points[1].push_back(rightBottomCorner);
 
