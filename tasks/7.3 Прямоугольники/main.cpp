@@ -31,145 +31,59 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <algorithm>
-#include <array>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-struct Point
+using ll = long long;
+
+struct Segment
 {
-	int x;
-	int y;
+	int xl, xr, y, type;
 };
-
-using Points = std::vector<Point>;
-using RectanglesPoints = std::array<Points, 2>;
-
-bool DoesRectangleIntersect(Point const& leftTop, Point const& rightBottom, int x)
-{
-	return leftTop.x <= x && rightBottom.x > x;
-}
-
-void DoubleSort(std::vector<int> coordinates, std::vector<int>& indicators, int left, int right)
-{
-	int pivot = coordinates[(left + right) / 2];
-	int i = left;
-	int j = right;
-	do
-	{
-		while (pivot > coordinates[i])
-		{
-			++i;
-		}
-		while (pivot < coordinates[j])
-		{
-			--j;
-		}
-
-		if (i <= j)
-		{
-			std::swap(coordinates[i], coordinates[j]);
-			std::swap(indicators[i], indicators[j]);
-			++i;
-			--j;
-		}
-	} while (i <= j);
-
-	if (left < j)
-	{
-		DoubleSort(coordinates, indicators, left, j);
-	}
-	if (i < right)
-	{
-		DoubleSort(coordinates, indicators, i, right);
-	}
-}
 
 void Solve(std::istream& input, std::ostream& output)
 {
-	size_t N;
+	int N;
 	input >> N;
 
-	RectanglesPoints points;
-	std::vector<int> xCoordinates(2 * N);
-	for (size_t i = 0; i < N; ++i)
+	std::vector<int> x;
+	std::vector<Segment> seg;
+	for (int i = 0; i < N; ++i)
 	{
-		Point leftTopCorner;
-		input >> leftTopCorner.x >> leftTopCorner.y;
-		Point rightBottomCorner;
-		input >> rightBottomCorner.x >> rightBottomCorner.y;
+		int x1, x2, y1, y2;
+		input >> x1 >> y1 >> x2 >> y2;
 
-		if (leftTopCorner.x > rightBottomCorner.x)
-		{
-			std::swap(leftTopCorner.x, rightBottomCorner.x);
-		}
-		if (leftTopCorner.y > rightBottomCorner.y)
-		{
-			std::swap(leftTopCorner.y, rightBottomCorner.y);
-		}
+		x.push_back(x1);
+		x.push_back(x2);
 
-		points[0].push_back(leftTopCorner);
-		points[1].push_back(rightBottomCorner);
-
-		xCoordinates[2 * i] = leftTopCorner.x;
-		xCoordinates[2 * i + 1] = rightBottomCorner.x;
+		seg.push_back({ x1, x2, y1, 1 });
+		seg.push_back({ x1, x2, y2, -1 });
 	}
 
-	std::sort(xCoordinates.begin(), xCoordinates.end());
+	std::sort(x.begin(), x.end());
+	std::sort(seg.begin(), seg.end(), [](Segment const& s1, Segment const& s2) {
+		return s1.y < s2.y;
+	});
 
-	int sectionHeight = 0;
-	int result = 0;
-	for (size_t i = 0; i < 2 * N; ++i)
+	ll result = 0;
+	for (int i = 1; i < 2 * N; ++i)
 	{
-		if (i != 0)
+		int prevY = 0, cnt = 0;
+		for (int j = 0; j < 2 * N; ++j)
 		{
-			result += std::abs((xCoordinates[i] - xCoordinates[i - 1]) * sectionHeight);
-		}
-
-		if (i == 0 || xCoordinates[i] != xCoordinates[i - 1])
-		{
-			size_t M = 0;
-			std::vector<int> yCoordinates(2 * N);
-			std::vector<int> sectionIndicators(2 * N);
-
-			for (size_t j = 0; j < N; ++j)
+			if (seg[j].xr <= x[i - 1] || seg[j].xl >= x[i])
 			{
-				if (DoesRectangleIntersect(points[0][j], points[1][j], xCoordinates[i]))
-				{
-					yCoordinates[M] = points[0][j].y;
-					yCoordinates[M + 1] = points[1][j].y;
-
-					sectionIndicators[M] = 1;
-					sectionIndicators[M + 1] = -1;
-
-					M += 2;
-				}
-
-				if (M == 0)
-				{
-					sectionHeight = 0;
-				}
-				else
-				{
-					DoubleSort(yCoordinates, sectionIndicators, 0, M - 1);
-
-					int sc = 0;
-					int bb = 0;
-					if (sectionIndicators[0] > 0)
-					{
-						++bb;
-					}
-					for (size_t k = 1; k < N; ++k)
-					{
-						if (bb > 0)
-						{
-							sc += yCoordinates[k] - yCoordinates[k - 1];
-							bb += sectionIndicators[k];
-						}
-					}
-
-					sectionHeight = std::abs(sc);
-				}
+				continue;
+			}
+			if (cnt == 0)
+			{
+				prevY = seg[j].y;
+			}
+			cnt += seg[j].type;
+			if (cnt == 0)
+			{
+				result += static_cast<ll>(seg[j].y - prevY) * static_cast<ll>(x[i] - x[i - 1]);
 			}
 		}
 	}
