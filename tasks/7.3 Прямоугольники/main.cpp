@@ -7,7 +7,7 @@
  * Ввод из файла INPUT.TXT. В первой строке содержится значение N (1 <= N <= 5000).
  * В каждой из следующих N  строк – четыре целых числа Ai, Bi, Ci, Di через пробел,
  определяющие координаты левого верхнего и правого нижнего углов  очередного  прямоугольника
- * (-106 <= Ai, Bi, Ci, Di <= 106; Ai <= Ci; Bi >= Di).
+ * (-10^6 <= Ai, Bi, Ci, Di <= 10^6; Ai <= Ci; Bi >= Di).
  *
  * Вывод в файл OUTPUT.TXT единственного целого числа - площади фигуры.
  *
@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <tuple>
 #include <vector>
 
 using ll = long long;
@@ -42,14 +43,14 @@ struct Segment
 	int xl, xr, y, type;
 };
 
-void Solve(std::istream& input, std::ostream& output)
+std::tuple<size_t, std::vector<int>, std::vector<Segment>> ReadCoordinates(std::istream& input)
 {
-	int N;
+	size_t N;
 	input >> N;
 
 	std::vector<int> x;
 	std::vector<Segment> seg;
-	for (int i = 0; i < N; ++i)
+	for (size_t i = 0; i < N; ++i)
 	{
 		int x1, x2, y1, y2;
 		input >> x1 >> y1 >> x2 >> y2;
@@ -61,32 +62,54 @@ void Solve(std::istream& input, std::ostream& output)
 		seg.push_back({ x1, x2, y2, -1 });
 	}
 
-	std::sort(x.begin(), x.end());
-	std::sort(seg.begin(), seg.end(), [](Segment const& s1, Segment const& s2) {
+	return { N, x, seg };
+}
+
+void Sort(std::vector<int>& xCoordinates, std::vector<Segment>& segments)
+{
+	std::sort(xCoordinates.begin(), xCoordinates.end());
+	std::sort(segments.begin(), segments.end(), [](Segment const& s1, Segment const& s2) {
 		return s1.y < s2.y;
 	});
+}
 
+ll CalculateResult(std::vector<int> const& xCoordinates, std::vector<Segment> const& segments, size_t N)
+{
 	ll result = 0;
-	for (int i = 1; i < 2 * N; ++i)
+	for (size_t i = 1; i < 2 * N; ++i)
 	{
-		int prevY = 0, cnt = 0;
-		for (int j = 0; j < 2 * N; ++j)
+		int previousOrdinate = 0;
+		int segmentCount = 0;
+
+		for (size_t j = 0; j < 2 * N; ++j)
 		{
-			if (seg[j].xr <= x[i - 1] || seg[j].xl >= x[i])
+			if (segments[j].xr <= xCoordinates[i - 1] || segments[j].xl >= xCoordinates[i])
 			{
 				continue;
 			}
-			if (cnt == 0)
+
+			if (segmentCount == 0)
 			{
-				prevY = seg[j].y;
+				previousOrdinate = segments[j].y;
 			}
-			cnt += seg[j].type;
-			if (cnt == 0)
+
+			segmentCount += segments[j].type;
+			if (segmentCount == 0)
 			{
-				result += static_cast<ll>(seg[j].y - prevY) * static_cast<ll>(x[i] - x[i - 1]);
+				result += static_cast<ll>(segments[j].y - previousOrdinate) * static_cast<ll>(xCoordinates[i] - xCoordinates[i - 1]);
 			}
 		}
 	}
+
+	return result;
+}
+
+void Solve(std::istream& input, std::ostream& output)
+{
+	auto [N, xCoordinates, segments] = ReadCoordinates(input);
+
+	Sort(xCoordinates, segments);
+	auto result = CalculateResult(xCoordinates, segments, N);
 
 	output << result << '\n';
 }
