@@ -42,18 +42,6 @@
 
 using Hash = int;
 
-void ReplaceAll(std::string& str, const std::string& from, const std::string& to)
-{
-	if (from.empty())
-		return;
-	size_t start_pos = 0;
-	while ((start_pos = str.find(from, start_pos)) != std::string::npos)
-	{
-		str.replace(start_pos, from.length(), to);
-		start_pos += to.length();
-	}
-}
-
 Hash InitializeHash(std::size_t length)
 {
 	int const d = 52;
@@ -106,45 +94,11 @@ Hash CalculateHash(std::string const& str, std::size_t length, Hash prevHash, Ha
 
 void Search(std::istream& haystack, std::string const& needle)
 {
-	std::string window;
-	char* buffer = new char[needle.length() + 1];
-	haystack.read(buffer, needle.length());
-	buffer[needle.length()] = '\0';
-	window = buffer;
-	ReplaceAll(window, "\n", " ");
-
-	Hash hash = 0;
-	auto needleHash = CalculateHash(needle, needle.length(), 0, hash);
-	auto windowHash = CalculateHash(window, needle.length(), 0, hash);
-
-	std::size_t k = 0;
-	bool found = false;
-	while (haystack)
-	{
-		if (needleHash == windowHash)
-		{
-			for (std::size_t i = 0; i < needle.length() && needle[i] == window[k + i]; ++i)
-			{
-				if (i == needle.length() - 1)
-				{
-					std::cout << k << '\n';
-					found = true;
-				}
-			}
-		}
-
-		++k;
-		haystack.read(buffer, needle.length());
-		buffer[needle.length()] = '\0';
-		window = buffer;
-		ReplaceAll(window, "\n", " ");
-		windowHash = CalculateHash(window, needle.length(), windowHash, hash);
-	}
-
-	if (!found)
-	{
-		std::cout << "No\n";
-	}
+	// while haystack
+	//   read window
+	//   calculate text and window hashes
+	//   if they match
+	//     check window, print position if match found
 }
 
 void Solve(std::istream& input, std::ostream& output)
